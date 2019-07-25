@@ -1,0 +1,5 @@
+#Arquivos de configuração do Intellj
+.idea/
+
+#Arquivos de configuração do Gradle
+.gradle/

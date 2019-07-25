@@ -18,6 +18,18 @@ public class ScriptTesteRedmine {
     private static WebElement menuProjetos;
     private static WebElement menuNovoProjeto;
 
+    private static WebElement inputCadastroNomeProjeto;
+    private static WebElement inputCadastroDescricaoProjeto;
+    private static WebElement checkBoxTipoTarefaFeature;
+    private static WebElement checkBoxTipoTarefaSupport;
+    private static WebElement botaoCriarProjeto;
+
+    private static WebElement menuProjetoCriado;
+    private static WebElement abaNovaTarefa;
+
+    private static WebElement inputTituloTarefa;
+    private static WebElement inputDescricaoTarefa;
+
      public static void main(String[] args){
         System.setProperty("webdriver.chrome.driver", "chromedriver");
          try {
@@ -43,11 +55,15 @@ public class ScriptTesteRedmine {
 
         preencherTelaCadastro(driver);
 
-        menuProjetos = driver.findElement(By.xpath("//div[@id='top-menu']//a[@class='projects']"));
-        menuProjetos.click();
+        acessarTelaProjetos(driver);
 
-        menuNovoProjeto = driver.findElement(By.xpath("//div[@class='contextual']//a[contains(text(), 'Novo projeto')]"));
-        menuNovoProjeto.click();
+        criarNovoProjeto(driver);
+
+        acessarTelaProjetos(driver);
+
+        acessarTelaNovaTarefa(driver);
+
+        criarTarefa(driver);
 
         Thread.sleep(30000);
         driver.quit();
@@ -74,5 +90,47 @@ public class ScriptTesteRedmine {
 
         botaoEnviarCadastro = driver.findElement(By.name("commit"));
         botaoEnviarCadastro.click();
+    }
+
+    private static void acessarTelaProjetos(WebDriver driver) throws Exception{
+        menuProjetos = driver.findElement(By.xpath("//div[@id='top-menu']//a[@class='projects']"));
+        menuProjetos.click();
+    }
+
+    private static void criarNovoProjeto(WebDriver driver) throws Exception{
+        menuNovoProjeto = driver.findElement(By.xpath("//div[@class='contextual']//a[contains(text(), 'Novo projeto')]"));
+        menuNovoProjeto.click();
+        
+        inputCadastroNomeProjeto = driver.findElement(By.id("project_name"));
+        inputCadastroNomeProjeto.sendKeys("Automação Redmine");
+
+        inputCadastroDescricaoProjeto = driver.findElement(By.id("project_description"));
+        inputCadastroDescricaoProjeto.sendKeys("Testes automatizados no redmine");
+
+        checkBoxTipoTarefaFeature = driver.findElement(By.xpath("//fieldset[@id='project_trackers']//label[2]//input"));
+        checkBoxTipoTarefaFeature.click();
+
+        checkBoxTipoTarefaSupport = driver.findElement(By.xpath("//fieldset[@id='project_trackers']//label[3]//input"));
+        checkBoxTipoTarefaSupport.click();
+
+        botaoCriarProjeto = driver.findElement(By.name("commit"));
+        botaoCriarProjeto.click();
+
+    }
+
+    private static void acessarTelaNovaTarefa(WebDriver driver) throws Exception{
+        menuProjetoCriado = driver.findElement(By.xpath("//a[contains(text(), 'Automação Redmine')]"));
+        menuProjetoCriado.click();
+
+        abaNovaTarefa = driver.findElement(By.xpath("//div[@id='main-menu']//a[contains(text(), 'Nova tarefa')]"));
+        abaNovaTarefa.click();
+    }
+
+    private static void criarTarefa(WebDriver driver) throws Exception{
+        inputTituloTarefa = driver.findElement(By.id("issue_subject"));
+        inputTituloTarefa.sendKeys("");
+
+        inputDescricaoTarefa = driver.findElement(By.id("issue_description"));
+        inputDescricaoTarefa.sendKeys("");
     }
 }

@@ -1,5 +1,7 @@
 package automacao;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -29,11 +31,13 @@ public class ScriptTesteRedmine {
 
     private static WebElement inputTituloTarefa;
     private static WebElement inputDescricaoTarefa;
+    private static WebElement botaoCriarTarefaEContinuar;
 
      public static void main(String[] args){
         System.setProperty("webdriver.chrome.driver", "chromedriver");
          try {
-             teste();
+             //teste();
+             testeLoginComJson();
          } catch (Exception e) {
              e.printStackTrace();
          }
@@ -63,9 +67,27 @@ public class ScriptTesteRedmine {
 
         acessarTelaNovaTarefa(driver);
 
-        criarTarefa(driver);
+        criarTarefas(driver);
 
         Thread.sleep(30000);
+        driver.quit();
+    }
+
+    public static void testeLoginComJson() throws Exception{
+        String jsonArray = JsonFileReader.getFileAsString("login.json");
+        List<LoginDTO> maps = JsonUtils.convertStringToObjectList(jsonArray, LoginDTO.class);
+
+        maps.stream().forEach(p -> System.out.println(p.getUsuario()));
+
+        String usuario = maps.get(1).getUsuario();
+
+        WebDriver driver = setConfigurationWebdriver();
+
+        WebElement menuEntrar = driver.findElement(By.xpath("//div[@id='account']//a[@class='login']"));
+        menuEntrar.click();
+
+        WebElement inputLogin = driver.findElement(By.id("username"));
+        inputLogin.sendKeys(usuario);
         driver.quit();
     }
 
@@ -126,11 +148,21 @@ public class ScriptTesteRedmine {
         abaNovaTarefa.click();
     }
 
-    private static void criarTarefa(WebDriver driver) throws Exception{
+    private static void criarTarefas(WebDriver driver) throws Exception{
         inputTituloTarefa = driver.findElement(By.id("issue_subject"));
-        inputTituloTarefa.sendKeys("");
-
         inputDescricaoTarefa = driver.findElement(By.id("issue_description"));
-        inputDescricaoTarefa.sendKeys("");
+        botaoCriarTarefaEContinuar = driver.findElement(By.name("continue"));
+        
+        String jsonArray = JsonFileReader.getFileAsString("tarefaRedmine.json");
+        List<TarefaRedmineDTO> maps = JsonUtils.convertStringToObjectList(jsonArray, TarefaRedmineDTO.class);
+
+        System.out.println("CADASTRO DE TAREFAS");
+
+        maps.stream().forEach(p -> {
+            inputTituloTarefa.sendKeys(p.getTituloTarefa());
+            inputDescricaoTarefa.sendKeys(p.getDescricaoTarefa());
+            botaoCriarTarefaEContinuar.click();
+
+        });
     }
 }

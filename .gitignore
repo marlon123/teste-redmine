@@ -1,5 +1,41 @@
-#Arquivos de configuração do Intellj
-.idea/
+### Gradle ###
+.gradle
+**/build/
+**/out/
+gradlew.bat
+!gradle-wrapper.jar
+/.metadata/
+/bin/
 
-#Arquivos de configuração do Gradle
-.gradle/
+target
+.vscode
+.idea
+*.log
+*.tmp
+*.iml
+*.gz
+*.jar
+.project
+.settings/
+.classpath
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/

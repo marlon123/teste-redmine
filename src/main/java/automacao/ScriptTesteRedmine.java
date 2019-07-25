@@ -39,11 +39,18 @@ public class ScriptTesteRedmine {
 
     }
 
-    public static void main(String args[]){
+    public static void main(String[] args){
+        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
 
     }
 
-    public void teste(){
-        String paginaInicial = "http://demo.redmine.org/";
+    private static WebDriver setConfigurationWebdriver(){
+        WebDriver driver = new ChromeDriver(options);
+        driver.manage().window().maximize();
+        driver.get("http://demo.redmine.org/");
+    }
+
+    public void teste() throws Exception{
+        
     }
 }

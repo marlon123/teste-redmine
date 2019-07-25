@@ -1,6 +1,9 @@
-plugins {
-    id 'java'
-}
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+mainClassName = 'ScriptTesteRedmine'
 
 group 'teste.redmine'
 version '1.0-SNAPSHOT'

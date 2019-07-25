@@ -6,6 +6,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ScriptTesteRedmine {
 
@@ -32,6 +34,8 @@ public class ScriptTesteRedmine {
     private static WebElement inputTituloTarefa;
     private static WebElement inputDescricaoTarefa;
     private static WebElement botaoCriarTarefaEContinuar;
+
+    private static WebElement abaTarefas;
 
      public static void main(String[] args){
         System.setProperty("webdriver.chrome.driver", "chromedriver");
@@ -68,6 +72,8 @@ public class ScriptTesteRedmine {
         acessarTelaNovaTarefa(driver);
 
         criarTarefas(driver);
+
+        visualizarTarefas(driver);
 
         Thread.sleep(30000);
         driver.quit();
@@ -152,6 +158,7 @@ public class ScriptTesteRedmine {
         inputTituloTarefa = driver.findElement(By.id("issue_subject"));
         inputDescricaoTarefa = driver.findElement(By.id("issue_description"));
         botaoCriarTarefaEContinuar = driver.findElement(By.name("continue"));
+        WebDriverWait aguardar = new WebDriverWait(driver, 10);
         
         String jsonArray = JsonFileReader.getFileAsString("tarefaRedmine.json");
         List<TarefaRedmineDTO> maps = JsonUtils.convertStringToObjectList(jsonArray, TarefaRedmineDTO.class);
@@ -162,7 +169,12 @@ public class ScriptTesteRedmine {
             inputTituloTarefa.sendKeys(p.getTituloTarefa());
             inputDescricaoTarefa.sendKeys(p.getDescricaoTarefa());
             botaoCriarTarefaEContinuar.click();
-
+            aguardar.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(inputTituloTarefa, "Erro")));
         });
+    }
+
+    private static void visualizarTarefas(WebDriver driver) throws Exception{
+        abaTarefas = driver.findElement(By.xpath("//div[@id='main-menu']//a[contains(text(), 'Tarefa')]"));
+         
     }
 }

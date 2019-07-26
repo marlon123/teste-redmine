@@ -1,18 +1,24 @@
-# Automa��o Redmine
+# Automação Redmine
 
 ## Ferramentas utilizadas
-### IDE: InteliJ Community
+### IDE: IntelliJ Community
 ### Gradle
 ### Selenium + Java
 
-## Execu��o do Projeto
-### Execu��o na IDE
+## Execução do Projeto
+### Execução na IDE
 Executar a classe ScriptTesteRedmine
 
-### Execu��o pelo jar
+###Execução com Gradle
+./gradlew run --args='chrome'
+./gradlew run --args='firefox'
+
+### Execução pelo jar
+#####Pré-condição: Java 8 ou superior 
 Executar o comando abaixo:
-java -jar redmine-teste-1.0.0.jar
+- java -jar redmine-teste-1.0-SNAPSHOT.jar "chrome"
+- java -jar redmine-teste-1.0-SNAPSHOT.jar "firefox"
 
 ## Drivers
-- Chrome: chromedriver
-- Firefox: geckodriver versão 0.22.0
+- Chrome: chromedriver versão 2.44 - suporta até o chrome 69
+- Firefox: geckodriver versão 0.22.0 - suporta até firefox 62

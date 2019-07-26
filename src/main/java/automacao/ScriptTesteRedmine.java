@@ -4,17 +4,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-//import org.apache.logging.log4j.core.Logger;
 
 public class ScriptTesteRedmine {
 
@@ -44,6 +45,8 @@ public class ScriptTesteRedmine {
 
     private static WebElement abaTarefas;
     private static WebElement gridTarefasColunaTituloTarefa;
+    private static WebElement gridTarefasColunaPrioridade;
+
     private static WebElement gridTarefasTituloAlteradoEm;
     private static WebElement gridTarefasLinkProximaPagina;
 
@@ -57,17 +60,19 @@ public class ScriptTesteRedmine {
                  mapInfo.put("Mensagem", "Nenhum parametro informado");
                  throw new Exception("Nenhum parametro informado");
              }
-             navegador = args[0].toUpperCase().trim();
-             if (navegador.contains("chrome")) {
-                 log.info("Iniciando chromedriver");
-                 System.setProperty("webdriver.chrome.driver", "chromedriver");
-                 teste();
-             } else if (navegador.contains("firefox")){
+             navegador = args[0].trim();
+
+             if (navegador.contains("firefox")){
                  log.info("Iniciando geckodriver");
                  System.setProperty("webdriver.gecko.driver", "geckodriver");
-                 teste();
+                 WebDriver driver = new FirefoxDriver();
+                 teste(driver);
+                 driver.quit();
              } else {
-                 throw new Exception("Navegador inválido = " + navegador);
+                 log.info("Iniciando chromedriver");
+                 System.setProperty("webdriver.chrome.driver", "chromedriver");
+                 WebDriver driver = new ChromeDriver();
+                 teste(driver);
              }
          }catch (Exception e){
              log.error(e.getMessage());
@@ -75,16 +80,13 @@ public class ScriptTesteRedmine {
 
      }
 
-    private static WebDriver setConfigurationWebdriver(){
-        WebDriver driver = new ChromeDriver();
-        //WebDriver driver = new FirefoxDriver();
+    private static void setConfigurationWebdriver(WebDriver driver){
         driver.manage().window().maximize();
         driver.get("http://demo.redmine.org/");
-        return driver;
     }
 
-    public static void teste() throws Exception{
-        WebDriver driver = setConfigurationWebdriver();
+    public static void teste(WebDriver driver) throws Exception{
+        setConfigurationWebdriver(driver);
 
         acessarTelaCadastroUsuario(driver);
 
@@ -92,9 +94,9 @@ public class ScriptTesteRedmine {
 
         acessarTelaProjetos(driver);
 
-        //criarNovoProjeto(driver);
+        criarNovoProjeto(driver);
 
-        //acessarTelaProjetos(driver);
+        acessarTelaProjetos(driver);
 
         acessarTelaNovaTarefa(driver);
 
@@ -105,9 +107,6 @@ public class ScriptTesteRedmine {
         paginarGridTarefas(driver);
 
         validarTarefaCadastrada(driver);
-
-        Thread.sleep(30000);
-        driver.quit();
     }
 
     private static void acessarTelaCadastroUsuario(WebDriver driver) throws  Exception{
@@ -119,9 +118,10 @@ public class ScriptTesteRedmine {
 
     private static void preencherFormularioCadastroUsuario(WebDriver driver) throws Exception{
         log.info("Preenchendo formulário de cadastro de usuário");
+        Integer random = new Random().ints(10, 1000).findFirst().getAsInt();
 
         inputCadastroLogin = driver.findElement(By.id("user_login"));
-        inputCadastroLogin.sendKeys("Testessss");
+        inputCadastroLogin.sendKeys("Teste"+random);
 
         inputCadastroSenha = driver.findElement(By.id("user_password"));
         inputCadastroSenha.sendKeys("123456");
@@ -136,7 +136,7 @@ public class ScriptTesteRedmine {
         inputCadastroSobrenome.sendKeys("Silva");
 
         inputCadastroEmail = driver.findElement(By.id("user_mail"));
-        inputCadastroEmail.sendKeys("teste05@gmail.com");
+        inputCadastroEmail.sendKeys("teste-"+random+"@gmail.com");
 
         botaoEnviarCadastro = driver.findElement(By.name("commit"));
         botaoEnviarCadastro.click();
@@ -174,7 +174,7 @@ public class ScriptTesteRedmine {
     private static void acessarTelaNovaTarefa(WebDriver driver) throws Exception{
         log.info("Acessando tela nova tarefa");
 
-         menuProjetoCriado = driver.findElement(By.xpath("//a[contains(text(), 'Automação Redmine')]"));
+        menuProjetoCriado = driver.findElement(By.xpath("//a[contains(text(), 'Automação Redmine')]"));
         menuProjetoCriado.click();
 
         abaNovaTarefa = driver.findElement(By.xpath("//div[@id='main-menu']//a[contains(text(), 'Nova tarefa')]"));
@@ -208,7 +208,9 @@ public class ScriptTesteRedmine {
     }
 
     private static void paginarGridTarefas(WebDriver driver) throws Exception{
-        gridTarefasTituloAlteradoEm = driver.findElement(By.xpath("//a[contains(text(), 'Alterado em')]"));
+         log.info("Ordenando grid de tarefas");
+         gridTarefasTituloAlteradoEm = driver.findElement(By.xpath("//a[contains(text(), 'Alterado em')]"));
+        gridTarefasTituloAlteradoEm.click();
         gridTarefasTituloAlteradoEm.click();
 
         gridTarefasLinkProximaPagina = driver.findElement(By.className("next"));
@@ -216,6 +218,14 @@ public class ScriptTesteRedmine {
     }
 
     private static void validarTarefaCadastrada(WebDriver driver) throws Exception{
-        gridTarefasColunaTituloTarefa = driver.findElement(By.xpath("//td[@class='subject']"));
+        String jsonArray = JsonFileReader.getFileAsString("tarefaRedmineValidacao.json");
+        List<TarefaRedmineDTO> maps = JsonUtils.convertStringToObjectList(jsonArray, TarefaRedmineDTO.class);
+
+        gridTarefasColunaTituloTarefa = driver.findElement(By.xpath("//tr[4]//td[@class='subject']//a"));
+        gridTarefasColunaPrioridade = driver.findElement(By.xpath("//tr[4]//td[@class='priority']"));
+
+        Assert.assertEquals(gridTarefasColunaTituloTarefa.getText(), maps.get(28).getTituloTarefa());
+        Assert.assertTrue(maps.get(28).getDescricaoTarefa().equalsIgnoreCase(gridTarefasColunaPrioridade.getText()));
+
     }
 }

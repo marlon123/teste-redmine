@@ -8,6 +8,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScriptTesteRedmine {
 
@@ -37,11 +39,15 @@ public class ScriptTesteRedmine {
 
     private static WebElement abaTarefas;
 
+    private static Logger log;
+
      public static void main(String[] args){
+        log = LoggerFactory.getLogger(ScriptTesteRedmine.class);
+
+        log.info("Iniciando chromedriver");
         System.setProperty("webdriver.chrome.driver", "chromedriver");
          try {
              teste();
-             //testeLoginComJson();
          } catch (Exception e) {
              e.printStackTrace();
          }
@@ -64,9 +70,9 @@ public class ScriptTesteRedmine {
 
         acessarTelaProjetos(driver);
 
-        criarNovoProjeto(driver);
+        //criarNovoProjeto(driver);
 
-        acessarTelaProjetos(driver);
+        //acessarTelaProjetos(driver);
 
         acessarTelaNovaTarefa(driver);
 
@@ -74,36 +80,26 @@ public class ScriptTesteRedmine {
 
         visualizarTarefas(driver);
 
+        paginarGridTarefas(driver);
+
+        validarTarefaCadastrada(driver);
+
         Thread.sleep(30000);
         driver.quit();
     }
 
-    public static void testeLoginComJson() throws Exception{
-        String jsonArray = JsonFileReader.getFileAsString("login.json");
-        List<LoginDTO> maps = JsonUtils.convertStringToObjectList(jsonArray, LoginDTO.class);
-
-        maps.stream().forEach(p -> System.out.println(p.getUsuario()));
-
-        String usuario = maps.get(1).getUsuario();
-
-        WebDriver driver = setConfigurationWebdriver();
-
-        WebElement menuEntrar = driver.findElement(By.xpath("//div[@id='account']//a[@class='login']"));
-        menuEntrar.click();
-
-        WebElement inputLogin = driver.findElement(By.id("username"));
-        inputLogin.sendKeys(usuario);
-        driver.quit();
-    }
-
     private static void acessarTelaCadastroUsuario(WebDriver driver) throws  Exception{
+         log.info("Acessando tela de cadastro de usuário");
+
         botaoCadastro = driver.findElement(By.xpath("//div[@id='account']//a[@class='register']"));
         botaoCadastro.click();
     }
 
     private static void preencherFormularioCadastroUsuario(WebDriver driver) throws Exception{
+        log.info("Preenchendo formulário de cadastro de usuário");
+
         inputCadastroLogin = driver.findElement(By.id("user_login"));
-        inputCadastroLogin.sendKeys("Teste");
+        inputCadastroLogin.sendKeys("Testessss");
 
         inputCadastroSenha = driver.findElement(By.id("user_password"));
         inputCadastroSenha.sendKeys("123456");
@@ -118,23 +114,26 @@ public class ScriptTesteRedmine {
         inputCadastroSobrenome.sendKeys("Silva");
 
         inputCadastroEmail = driver.findElement(By.id("user_mail"));
-        inputCadastroEmail.sendKeys("teste@gmail.com");
+        inputCadastroEmail.sendKeys("teste05@gmail.com");
 
         botaoEnviarCadastro = driver.findElement(By.name("commit"));
         botaoEnviarCadastro.click();
     }
 
     private static void acessarTelaProjetos(WebDriver driver) throws Exception{
+        log.info("Acessando tela de projetos");
         menuProjetos = driver.findElement(By.xpath("//div[@id='top-menu']//a[@class='projects']"));
         menuProjetos.click();
     }
 
     private static void criarNovoProjeto(WebDriver driver) throws Exception{
+        log.info("Criando novo projeto");
+
         menuNovoProjeto = driver.findElement(By.xpath("//div[@class='contextual']//a[contains(text(), 'Novo projeto')]"));
         menuNovoProjeto.click();
         
         inputCadastroNomeProjeto = driver.findElement(By.id("project_name"));
-        inputCadastroNomeProjeto.sendKeys("Automa��o Redmine");
+        inputCadastroNomeProjeto.sendKeys("Automação Redmine");
 
         inputCadastroDescricaoProjeto = driver.findElement(By.id("project_description"));
         inputCadastroDescricaoProjeto.sendKeys("Testes automatizados no redmine");
@@ -151,7 +150,9 @@ public class ScriptTesteRedmine {
     }
 
     private static void acessarTelaNovaTarefa(WebDriver driver) throws Exception{
-        menuProjetoCriado = driver.findElement(By.xpath("//a[contains(text(), 'Automa��o Redmine')]"));
+        log.info("Acessando tela nova tarefa");
+
+         menuProjetoCriado = driver.findElement(By.xpath("//a[contains(text(), 'Automação Redmine')]"));
         menuProjetoCriado.click();
 
         abaNovaTarefa = driver.findElement(By.xpath("//div[@id='main-menu']//a[contains(text(), 'Nova tarefa')]"));
@@ -159,6 +160,8 @@ public class ScriptTesteRedmine {
     }
 
     private static void criarTarefas(WebDriver driver) throws Exception{
+        log.info("Criando tarefas");
+
         inputTituloTarefa = driver.findElement(By.id("issue_subject"));
         inputDescricaoTarefa = driver.findElement(By.id("issue_description"));
         botaoCriarTarefaEContinuar = driver.findElement(By.name("continue"));
@@ -169,16 +172,31 @@ public class ScriptTesteRedmine {
 
         System.out.println("CADASTRO DE TAREFAS");
 
-        maps.stream().forEach(p -> {
-            inputTituloTarefa.sendKeys(p.getTituloTarefa());
+        for (TarefaRedmineDTO p : maps) {
+            //inputTituloTarefa.wait(2000);
+            try {
+                inputTituloTarefa.sendKeys(p.getTituloTarefa());
+            }catch (org.openqa.selenium.StaleElementReferenceException ex){
+                inputTituloTarefa.sendKeys(p.getTituloTarefa());
+            }
             inputDescricaoTarefa.sendKeys(p.getDescricaoTarefa());
             botaoCriarTarefaEContinuar.click();
-            aguardar.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(inputTituloTarefa, "Erro")));
-        });
+
+            log.info("Tarefa criada");
+            //aguardar.wait(2000);
+            //aguardar.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(inputTituloTarefa, "Erro")));
+        }
     }
 
     private static void visualizarTarefas(WebDriver driver) throws Exception{
         abaTarefas = driver.findElement(By.xpath("//div[@id='main-menu']//a[contains(text(), 'Tarefa')]"));
-         
+    }
+
+    private static void paginarGridTarefas(WebDriver driver) throws Exception{
+
+    }
+
+    private static void validarTarefaCadastrada(WebDriver driver) throws Exception{
+
     }
 }

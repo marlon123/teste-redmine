@@ -2,10 +2,12 @@ package automacao;
 
 import java.util.List;
 
+//import org.apache.logging.log4j.core.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -39,13 +41,15 @@ public class ScriptTesteRedmine {
 
     private static WebElement abaTarefas;
 
-    private static Logger log;
+    private static final Logger log = LoggerFactory.getLogger(ScriptTesteRedmine.class);
+    //private static final Logger log = java.util.logging.Logger.getLogger()
 
      public static void main(String[] args){
-        log = LoggerFactory.getLogger(ScriptTesteRedmine.class);
+        //log = LoggerFactory.getLogger(ScriptTesteRedmine.class);
 
         log.info("Iniciando chromedriver");
         System.setProperty("webdriver.chrome.driver", "chromedriver");
+         //System.setProperty("webdriver.gecko.driver", "geckodriver");
          try {
              teste();
          } catch (Exception e) {
@@ -56,6 +60,7 @@ public class ScriptTesteRedmine {
 
     private static WebDriver setConfigurationWebdriver(){
         WebDriver driver = new ChromeDriver();
+        //WebDriver driver = new FirefoxDriver();
         driver.manage().window().maximize();
         driver.get("http://demo.redmine.org/");
         return driver;

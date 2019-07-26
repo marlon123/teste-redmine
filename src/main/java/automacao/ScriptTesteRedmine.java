@@ -40,8 +40,8 @@ public class ScriptTesteRedmine {
      public static void main(String[] args){
         System.setProperty("webdriver.chrome.driver", "chromedriver");
          try {
-             //teste();
-             testeLoginComJson();
+             teste();
+             //testeLoginComJson();
          } catch (Exception e) {
              e.printStackTrace();
          }
@@ -58,10 +58,9 @@ public class ScriptTesteRedmine {
     public static void teste() throws Exception{
         WebDriver driver = setConfigurationWebdriver();
 
-        botaoCadastro = driver.findElement(By.xpath("//div[@id='account']//a[@class='register']"));
-        botaoCadastro.click();
+        acessarTelaCadastroUsuario(driver);
 
-        preencherTelaCadastro(driver);
+        preencherFormularioCadastroUsuario(driver);
 
         acessarTelaProjetos(driver);
 
@@ -97,7 +96,12 @@ public class ScriptTesteRedmine {
         driver.quit();
     }
 
-    private static void preencherTelaCadastro(WebDriver driver) throws Exception{
+    private static void acessarTelaCadastroUsuario(WebDriver driver) throws  Exception{
+        botaoCadastro = driver.findElement(By.xpath("//div[@id='account']//a[@class='register']"));
+        botaoCadastro.click();
+    }
+
+    private static void preencherFormularioCadastroUsuario(WebDriver driver) throws Exception{
         inputCadastroLogin = driver.findElement(By.id("user_login"));
         inputCadastroLogin.sendKeys("Teste");
 
@@ -130,7 +134,7 @@ public class ScriptTesteRedmine {
         menuNovoProjeto.click();
         
         inputCadastroNomeProjeto = driver.findElement(By.id("project_name"));
-        inputCadastroNomeProjeto.sendKeys("Automação Redmine");
+        inputCadastroNomeProjeto.sendKeys("Automaï¿½ï¿½o Redmine");
 
         inputCadastroDescricaoProjeto = driver.findElement(By.id("project_description"));
         inputCadastroDescricaoProjeto.sendKeys("Testes automatizados no redmine");
@@ -147,7 +151,7 @@ public class ScriptTesteRedmine {
     }
 
     private static void acessarTelaNovaTarefa(WebDriver driver) throws Exception{
-        menuProjetoCriado = driver.findElement(By.xpath("//a[contains(text(), 'Automação Redmine')]"));
+        menuProjetoCriado = driver.findElement(By.xpath("//a[contains(text(), 'Automaï¿½ï¿½o Redmine')]"));
         menuProjetoCriado.click();
 
         abaNovaTarefa = driver.findElement(By.xpath("//div[@id='main-menu']//a[contains(text(), 'Nova tarefa')]"));

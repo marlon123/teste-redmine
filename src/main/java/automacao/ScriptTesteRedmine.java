@@ -40,6 +40,9 @@ public class ScriptTesteRedmine {
     private static WebElement botaoCriarTarefaEContinuar;
 
     private static WebElement abaTarefas;
+    private static WebElement gridTarefasColunaTituloTarefa;
+    private static WebElement gridTarefasTituloAlteradoEm;
+    private static WebElement gridTarefasLinkProximaPagina;
 
     private static final Logger log = LoggerFactory.getLogger(ScriptTesteRedmine.class);
     //private static final Logger log = java.util.logging.Logger.getLogger()
@@ -167,41 +170,38 @@ public class ScriptTesteRedmine {
     private static void criarTarefas(WebDriver driver) throws Exception{
         log.info("Criando tarefas");
 
-        inputTituloTarefa = driver.findElement(By.id("issue_subject"));
-        inputDescricaoTarefa = driver.findElement(By.id("issue_description"));
-        botaoCriarTarefaEContinuar = driver.findElement(By.name("continue"));
         WebDriverWait aguardar = new WebDriverWait(driver, 10);
         
         String jsonArray = JsonFileReader.getFileAsString("tarefaRedmine.json");
         List<TarefaRedmineDTO> maps = JsonUtils.convertStringToObjectList(jsonArray, TarefaRedmineDTO.class);
 
-        System.out.println("CADASTRO DE TAREFAS");
-
         for (TarefaRedmineDTO p : maps) {
-            //inputTituloTarefa.wait(2000);
-            try {
-                inputTituloTarefa.sendKeys(p.getTituloTarefa());
-            }catch (org.openqa.selenium.StaleElementReferenceException ex){
-                inputTituloTarefa.sendKeys(p.getTituloTarefa());
-            }
+            inputTituloTarefa = driver.findElement(By.id("issue_subject"));
+            aguardar.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(inputTituloTarefa, "Erro")));
+            inputTituloTarefa.sendKeys(p.getTituloTarefa());
+            inputDescricaoTarefa = driver.findElement(By.id("issue_description"));
             inputDescricaoTarefa.sendKeys(p.getDescricaoTarefa());
+            botaoCriarTarefaEContinuar = driver.findElement(By.name("continue"));
             botaoCriarTarefaEContinuar.click();
 
             log.info("Tarefa criada");
-            //aguardar.wait(2000);
-            //aguardar.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(inputTituloTarefa, "Erro")));
         }
     }
 
     private static void visualizarTarefas(WebDriver driver) throws Exception{
         abaTarefas = driver.findElement(By.xpath("//div[@id='main-menu']//a[contains(text(), 'Tarefa')]"));
+        abaTarefas.click();
     }
 
     private static void paginarGridTarefas(WebDriver driver) throws Exception{
+        gridTarefasTituloAlteradoEm = driver.findElement(By.xpath("//a[contains(text(), 'Alterado em')]"));
+        gridTarefasTituloAlteradoEm.click();
 
+        gridTarefasLinkProximaPagina = driver.findElement(By.className("next"));
+        gridTarefasLinkProximaPagina.click();
     }
 
     private static void validarTarefaCadastrada(WebDriver driver) throws Exception{
-
+        gridTarefasColunaTituloTarefa = driver.findElement(By.xpath("//td[@class='subject']"));
     }
 }

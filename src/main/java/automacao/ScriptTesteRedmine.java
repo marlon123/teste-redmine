@@ -1,17 +1,20 @@
 package automacao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-//import org.apache.logging.log4j.core.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+//import org.apache.logging.log4j.core.Logger;
 
 public class ScriptTesteRedmine {
 
@@ -45,18 +48,29 @@ public class ScriptTesteRedmine {
     private static WebElement gridTarefasLinkProximaPagina;
 
     private static final Logger log = LoggerFactory.getLogger(ScriptTesteRedmine.class);
-    //private static final Logger log = java.util.logging.Logger.getLogger()
+    private static Map<String, Object> mapInfo = new HashMap();
 
      public static void main(String[] args){
-        //log = LoggerFactory.getLogger(ScriptTesteRedmine.class);
-
-        log.info("Iniciando chromedriver");
-        System.setProperty("webdriver.chrome.driver", "chromedriver");
-         //System.setProperty("webdriver.gecko.driver", "geckodriver");
-         try {
-             teste();
-         } catch (Exception e) {
-             e.printStackTrace();
+         String navegador = "";
+         try{
+             if (Objects.isNull(args) || args.length == 0) {
+                 mapInfo.put("Mensagem", "Nenhum parametro informado");
+                 throw new Exception("Nenhum parametro informado");
+             }
+             navegador = args[0].toUpperCase().trim();
+             if (navegador.contains("chrome")) {
+                 log.info("Iniciando chromedriver");
+                 System.setProperty("webdriver.chrome.driver", "chromedriver");
+                 teste();
+             } else if (navegador.contains("firefox")){
+                 log.info("Iniciando geckodriver");
+                 System.setProperty("webdriver.gecko.driver", "geckodriver");
+                 teste();
+             } else {
+                 throw new Exception("Navegador inválido = " + navegador);
+             }
+         }catch (Exception e){
+             log.error(e.getMessage());
          }
 
      }

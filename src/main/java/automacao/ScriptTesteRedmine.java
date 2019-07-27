@@ -1,6 +1,5 @@
 package automacao;
 
-import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,21 +25,26 @@ public class ScriptTesteRedmine {
              }
              navegador = args[0].trim();
 
-             setConfigurationWebdriver(navegador);
-
-             teste();
-
+             setup(navegador);
+             executarCenarioTeste();
+             tearDown();
          }catch (Exception e){
              log.error(e.getMessage());
          }
 
      }
 
-    private static void setConfigurationWebdriver(String navegador){
+    private static void setup(String navegador){
+         log.info("Configurando WebDriver!");
         DriverFactory.getDriver(navegador).get("http://demo.redmine.org/");
     }
 
-    public static void teste() throws Exception{
+    private static void tearDown(){
+         log.info("Encerrando WebDriver!");
+         DriverFactory.killDriver();
+    }
+
+    public static void executarCenarioTeste() throws Exception{
         acessarTelaCadastroUsuario();
 
         preencherFormularioCadastroUsuario();

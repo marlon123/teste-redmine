@@ -1,8 +1,6 @@
 package automacao;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +13,7 @@ import static automacao.DemoRedminePage.*;
 public class ScriptTesteRedmine {
 
     private static DemoRedminePage demoRedminePage;
+
     private static final Logger log = LoggerFactory.getLogger(ScriptTesteRedmine.class);
     private static Map<String, Object> mapInfo = new HashMap();
 
@@ -27,51 +26,40 @@ public class ScriptTesteRedmine {
              }
              navegador = args[0].trim();
 
-             if (navegador.contains("firefox")){
-                 log.info("Iniciando geckodriver");
-                 System.setProperty("webdriver.gecko.driver", "geckodriver");
-                 WebDriver driver = new FirefoxDriver();
-                 teste(driver);
-                 driver.quit();
-             } else {
-                 log.info("Iniciando chromedriver");
-                 System.setProperty("webdriver.chrome.driver", "chromedriver");
-                 WebDriver driver = new ChromeDriver();
-                 teste(driver);
-             }
+             setConfigurationWebdriver(navegador);
+
+             teste();
+
          }catch (Exception e){
              log.error(e.getMessage());
          }
 
      }
 
-    private static void setConfigurationWebdriver(WebDriver driver){
-        driver.manage().window().maximize();
-        driver.get("http://demo.redmine.org/");
+    private static void setConfigurationWebdriver(String navegador){
+        DriverFactory.getDriver(navegador).get("http://demo.redmine.org/");
     }
 
-    public static void teste(WebDriver driver) throws Exception{
-        setConfigurationWebdriver(driver);
+    public static void teste() throws Exception{
+        acessarTelaCadastroUsuario();
 
-        acessarTelaCadastroUsuario(driver);
+        preencherFormularioCadastroUsuario();
 
-        preencherFormularioCadastroUsuario(driver);
+        acessarTelaProjetos();
 
-        acessarTelaProjetos(driver);
+        criarNovoProjeto();
 
-        criarNovoProjeto(driver);
+        acessarTelaProjetos();
 
-        acessarTelaProjetos(driver);
+        acessarTelaNovaTarefa();
 
-        acessarTelaNovaTarefa(driver);
+        criarTarefas();
 
-        criarTarefas(driver);
+        visualizarTarefas();
 
-        visualizarTarefas(driver);
+        paginarGridTarefas();
 
-        paginarGridTarefas(driver);
-
-        validarTarefaCadastrada(driver);
+        validarTarefaCadastrada();
     }
 
 }

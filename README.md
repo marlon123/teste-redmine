@@ -10,8 +10,8 @@
 Executar a classe ScriptTesteRedmine
 
 ###Execução com Gradle
-./gradlew run --args='chrome'
-./gradlew run --args='firefox'
+- ./gradlew run --args='chrome'
+- ./gradlew run --args='firefox'
 
 ### Execução pelo jar
 #####Pré-condição: Java 8 ou superior 
